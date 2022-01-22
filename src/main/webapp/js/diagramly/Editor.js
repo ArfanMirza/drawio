@@ -164,6 +164,11 @@
 	Editor.tailSpin = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9Ii0yIC0yIDQ0IDQ0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogICAgPGRlZnM+CiAgICAgICAgPGxpbmVhckdyYWRpZW50IHgxPSI4LjA0MiUiIHkxPSIwJSIgeDI9IjY1LjY4MiUiIHkyPSIyMy44NjUlIiBpZD0iYSI+CiAgICAgICAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiM4MDgwODAiIHN0b3Atb3BhY2l0eT0iMCIgb2Zmc2V0PSIwJSIvPgogICAgICAgICAgICA8c3RvcCBzdG9wLWNvbG9yPSIjODA4MDgwIiBzdG9wLW9wYWNpdHk9Ii42MzEiIG9mZnNldD0iNjMuMTQ2JSIvPgogICAgICAgICAgICA8c3RvcCBzdG9wLWNvbG9yPSIjODA4MDgwIiBvZmZzZXQ9IjEwMCUiLz4KICAgICAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPC9kZWZzPgogICAgPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxIDEpIj4KICAgICAgICAgICAgPHBhdGggZD0iTTM2IDE4YzAtOS45NC04LjA2LTE4LTE4LTE4IiBzdHJva2U9InVybCgjYSkiIHN0cm9rZS13aWR0aD0iNiI+CiAgICAgICAgICAgICAgICA8YW5pbWF0ZVRyYW5zZm9ybQogICAgICAgICAgICAgICAgICAgIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIKICAgICAgICAgICAgICAgICAgICB0eXBlPSJyb3RhdGUiCiAgICAgICAgICAgICAgICAgICAgZnJvbT0iMCAxOCAxOCIKICAgICAgICAgICAgICAgICAgICB0bz0iMzYwIDE4IDE4IgogICAgICAgICAgICAgICAgICAgIGR1cj0iMC45cyIKICAgICAgICAgICAgICAgICAgICByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIgLz4KICAgICAgICAgICAgPC9wYXRoPgogICAgICAgICAgICA8Y2lyY2xlIGZpbGw9IiM4MDgwODAiIGN4PSIzNiIgY3k9IjE4IiByPSIxIj4KICAgICAgICAgICAgICAgIDxhbmltYXRlVHJhbnNmb3JtCiAgICAgICAgICAgICAgICAgICAgYXR0cmlidXRlTmFtZT0idHJhbnNmb3JtIgogICAgICAgICAgICAgICAgICAgIHR5cGU9InJvdGF0ZSIKICAgICAgICAgICAgICAgICAgICBmcm9tPSIwIDE4IDE4IgogICAgICAgICAgICAgICAgICAgIHRvPSIzNjAgMTggMTgiCiAgICAgICAgICAgICAgICAgICAgZHVyPSIwLjlzIgogICAgICAgICAgICAgICAgICAgIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgICAgICAgICA8L2NpcmNsZT4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPgo=';
 
 	/**
+	 * 
+	 */
+	Editor.mailImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjRweCIgZmlsbD0iIzAwMDAwMCI+PHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIi8+PHBhdGggZD0iTTIyIDZjMC0xLjEtLjktMi0yLTJINGMtMS4xIDAtMiAuOS0yIDJ2MTJjMCAxLjEuOSAyIDIgMmgxNmMxLjEgMCAyLS45IDItMlY2em0tMiAwbC04IDQuOTlMNCA2aDE2em0wIDEySDRWOGw4IDUgOC01djEweiIvPjwvc3ZnPg==';
+
+	/**
 	 * Used in the GraphViewer lightbox.
 	 */
 	Editor.tweetImage = IMAGE_PATH + '/tweet.png';
@@ -298,6 +303,14 @@
 	 * Common properties for all edges.
 	 */
 	Editor.commonProperties = [
+		{name: 'enumerate', dispName: 'Enumerate', type: 'bool', defVal: false, onChange: function(graph)
+		{
+			graph.refresh();
+		}},
+		{name: 'enumerateValue', dispName: 'Enumerate Value', type: 'string', defVal: '', isVisible: function(state, format)
+		{
+			return mxUtils.getValue(state.style, 'enumerate', '0') == '1';
+		}},
         {name: 'comic', dispName: 'Comic', type: 'bool', defVal: false, isVisible: function(state, format)
         {
         	return mxUtils.getValue(state.style, 'sketch', '0') != '1';
@@ -576,6 +589,11 @@
 		'## Parent style for nodes with child nodes (placeholders are replaced once).\n' +
 		'#\n' +
 		'# parentstyle: swimlane;whiteSpace=wrap;html=1;childLayout=stackLayout;horizontal=1;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;\n' +
+		'#\n' +
+		'## Style to be used for objects not in the CSV. If this is - then such objects are ignored,\n' +
+		'## else they are created using this as their style, eg. whiteSpace=wrap;html=1;\n' +
+		'#\n' +
+		'# unknownStyle: -\n' +
 		'#\n' +
 		'## Optional column name that contains a reference to a named style in styles.\n' +
 		'## Default is the current style for nodes.\n' +
@@ -1257,7 +1275,18 @@
 				return shapeCreateHandJiggle.apply(this, arguments);
 			}
 		};
-		
+
+		// Avoids duplicate painting of images
+		var imageShapePaintVertexShape = mxImageShape.prototype.paintVertexShape;
+
+		mxImageShape.prototype.paintVertexShape = function(c, x, y, w, h)
+		{
+			if (c.handJiggle == null || !c.handJiggle.passThrough)
+			{
+				imageShapePaintVertexShape.apply(this, arguments);
+			}
+		};
+
 		// Overrides for event handling on transparent background for sketch style
 		var shapePaint = mxShape.prototype.paint;
 		mxShape.prototype.paint = function(c)
@@ -2577,9 +2606,10 @@
 		// No access-control-allow-origin for some Iconfinder images, add this when fixed:
 		// /^https?:\/\/[^\/]*\.iconfinder.com\//.test(url) ||
 		return (this.corsRegExp != null && this.corsRegExp.test(url)) ||
-			url.substring(0, 34) === 'https://raw.githubusercontent.com/';
+			url.substring(0, 34) === 'https://raw.githubusercontent.com/' ||
+			url.substring(0, 29) === 'https://fonts.googleapis.com/' ||
+			url.substring(0, 26) === 'https://fonts.gstatic.com/';
 	};
-	
 	
 	/**
 	 * Converts all images in the SVG output to data URIs for immediate rendering
@@ -3006,6 +3036,19 @@
 	};
 	
 	/**
+	 * Returns the URL and mime type to be used for the given font.
+	 */
+	Editor.prototype.mapFontUrl = function(mime, url, fn)
+	{
+		if ((/^https?:\/\//.test(url)) && !this.isCorsEnabledForUrl(url))
+		{
+			url = PROXY_URL + '?url=' + encodeURIComponent(url);
+		}
+
+		fn(mime, url);
+	};
+
+	/**
 	 * For the fonts in CSS to be applied when rendering images on canvas, the actual
 	 * font data must be made available via a data URI encoding of the file.
 	 */
@@ -3033,7 +3076,7 @@
                     result.push(this.cachedFonts[Editor.trimCssUrl(parts[j].substring(0, idx))]);
                     result.push('"' + parts[j].substring(idx));
                 }
-                
+				
                 then(result.join(''));
             }
         });
@@ -3088,26 +3131,22 @@
                         {
                             mime = 'application/font-sfnt';
                         }
-                        
-                        var realUrl = url;
-                        
-                        if ((/^https?:\/\//.test(realUrl)) && !this.isCorsEnabledForUrl(realUrl))
-                        {
-                            realUrl = PROXY_URL + '?url=' + encodeURIComponent(url);
-                        }
 
-                        // LATER: Remove cache-control header
-                        this.loadUrl(realUrl, mxUtils.bind(this, function(uri)
-                        {
-                        	this.cachedFonts[url] = uri;
-                            waiting--;
-                            finish();
-                        }), mxUtils.bind(this, function(err)
-                        {
-                            // LATER: handle error
-                            waiting--;
-                            finish();
-                        }), true, null, 'data:' + mime + ';charset=utf-8;base64,');
+						this.mapFontUrl(mime, url, mxUtils.bind(this, function(realMime, realUrl)
+						{
+							// LATER: Remove cache-control header
+							this.loadUrl(realUrl, mxUtils.bind(this, function(uri)
+							{
+								this.cachedFonts[url] = uri;
+								waiting--;
+								finish();
+							}), mxUtils.bind(this, function(err)
+							{
+								// LATER: handle error
+								waiting--;
+								finish();
+							}), true, null, 'data:' + realMime + ';charset=utf-8;base64,');
+						}));
                     }
                 }))(Editor.trimCssUrl(parts[i].substring(0, idx)), format);
             }
@@ -3145,6 +3184,24 @@
             then();
         }
     };
+
+	/**
+	 * Returns a CSS mapping for the given CSS URL.
+	 */
+	Editor.prototype.createGoogleFontCache = function()
+	{
+		var cache = {};
+
+		for (var key in Graph.fontMapping)
+		{
+			if (Graph.isCssFontUrl(key))
+			{
+				cache[key] = Graph.fontMapping[key];
+			}
+		}
+
+		return cache;
+	};
     
     /**
      * Embeds external fonts
@@ -3159,7 +3216,7 @@
 			
 			if (this.cachedGoogleFonts == null)
 			{
-				this.cachedGoogleFonts = {};
+				this.cachedGoogleFonts = this.createGoogleFontCache();
 			}
 			
 			var googleCssDone = mxUtils.bind(this, function()
@@ -3230,7 +3287,10 @@
 			for (var i = 0; i < styles.length; i++)
 			{
 				// Ignores style elements with no MathJax CSS
-				if (mxUtils.getTextContent(styles[i]).indexOf('MathJax') > 0)
+				var content = mxUtils.getTextContent(styles[i]);
+
+				if (content.indexOf('mxPageSelector') < 0 &&
+					content.indexOf('MathJax') > 0)
 				{
 					defs[0].appendChild(styles[i].cloneNode(true));
 				}
@@ -4243,7 +4303,12 @@
 			{name: 'fixedRows', dispName: 'Fixed Rows', type: 'bool', defVal: false},
 			{name: 'resizeLast', dispName: 'Resize Last Column', type: 'bool', defVal: false},
 			{name: 'resizeLastRow', dispName: 'Resize Last Row', type: 'bool', defVal: false}].
-			concat(mxCellRenderer.defaultShapes['swimlane'].prototype.customProperties);
+			concat(mxCellRenderer.defaultShapes['swimlane'].prototype.customProperties).
+			concat(mxCellRenderer.defaultShapes['partialRectangle'].prototype.customProperties);
+
+		mxCellRenderer.defaultShapes['tableRow'].prototype.customProperties =
+			mxCellRenderer.defaultShapes['swimlane'].prototype.customProperties.
+			concat(mxCellRenderer.defaultShapes['partialRectangle'].prototype.customProperties);
 		
 		mxCellRenderer.defaultShapes['doubleEllipse'].prototype.customProperties = [
 	        {name: 'margin', dispName: 'Indent', type: 'float', min:0, defVal:4}
@@ -4845,13 +4910,13 @@
 				}
 				else
 				{
-					td.innerHTML = pValue;
+					td.innerHTML = mxUtils.htmlEntities(decodeURIComponent(pValue));
 					
 					mxEvent.addListener(td, 'click', mxUtils.bind(that, function()
 					{
 						var input = document.createElement('input');
 						setElementPos(td, input, true);
-						input.value = pValue;
+						input.value = decodeURIComponent(pValue);
 						input.className = 'gePropEditor';
 						
 						if ((pType == 'int' || pType == 'float') && !prop.allowAuto)
@@ -4900,7 +4965,7 @@
 								inputVal = prop.max;
 							}
 
-							var newVal = mxUtils.htmlEntities((pType == 'int'? parseInt(inputVal) : inputVal) + '');
+							var newVal = encodeURIComponent((pType == 'int'? parseInt(inputVal) : inputVal) + '');
 							
 							applyStyleVal(pName, newVal, prop);
 						}
@@ -5474,6 +5539,13 @@
 	}
 	
 	/**
+	 * Maps fonts to font-face CSS.
+	 */
+	Graph.fontMapping = {'https://fonts.googleapis.com/css?family=Architects+Daughter':
+		'@font-face { font-family: "Architects Daughter"; ' + 
+		'src: url(' + STYLE_PATH + '/fonts/ArchitectsDaughter-Regular.ttf) format("truetype"); }'};
+
+	/**
 	 * Lookup table for mapping from font URL and name to elements in the DOM.
 	 */
 	Graph.customFontElements = {};
@@ -5505,8 +5577,9 @@
 	Graph.createFontElement = function(name, url)
 	{
 		var elt = null;
+		var style = Graph.fontMapping[url];
 
-		if (Graph.isCssFontUrl(url))
+		if (style == null && Graph.isCssFontUrl(url))
 		{
 			elt = document.createElement('link');
 			elt.setAttribute('rel', 'stylesheet');
@@ -5516,10 +5589,15 @@
 		}
 		else
 		{
+			if (style == null)
+			{
+				style = '@font-face {\n' +	
+					'font-family: "' + name + '";\n' + 	
+					'src: url("' + url + '");\n}'
+			}
+
 			elt = document.createElement('style');
-			mxUtils.write(elt, '@font-face {\n' +	
-				'font-family: "' + name + '";\n' + 	
-				'src: url("' + url + '");\n}');
+			mxUtils.write(elt, style);
 		}
 		
 		return elt;
@@ -6500,6 +6578,114 @@
 		}
 		
 		return imgExport;
+	};
+
+	/**
+	 * Overridden to destroy the shape number.
+	 */
+	var cellRendererDestroy = mxCellRenderer.prototype.destroy;
+	mxCellRenderer.prototype.destroy = function(state)
+	{
+		cellRendererDestroy.apply(this, arguments);
+		
+		if (state.secondLabel != null)
+		{
+			state.secondLabel.destroy();
+			state.secondLabel = null;
+		}
+	};
+	
+	/**
+	 * Includes the shape number in the return value.
+	 */
+	mxCellRenderer.prototype.getShapesForState = function(state)
+	{
+		return [state.shape, state.text, state.secondLabel, state.control];
+	};
+
+	/**
+	 * Resets the global shape counter.
+	 */
+	var graphViewResetValidationState = mxGraphView.prototype.resetValidationState;
+	
+	mxGraphView.prototype.resetValidationState = function()
+	{
+		graphViewResetValidationState.apply(this, arguments);
+		this.enumerationState = 0;
+	};
+	
+	/**
+	 * Adds shape number update the validation step.
+	 */
+	var graphViewStateValidated = mxGraphView.prototype.stateValidated;
+	
+	mxGraphView.prototype.stateValidated = function(state)
+	{
+		if (state.shape != null)
+		{
+			this.redrawEnumerationState(state);
+		}
+
+		return graphViewStateValidated.apply(this, arguments);
+	};
+
+	/**
+	 * Returns the markup to be used for the enumeration shape.
+	 */
+	mxGraphView.prototype.createEnumerationValue = function(state)
+	{
+		var value =  decodeURIComponent(mxUtils.getValue(state.style, 'enumerateValue', ''));
+
+		if (value == '')
+		{
+			value = ++this.enumerationState;
+		}
+
+		return '<div style="padding:2px;border:1px solid gray;background:yellow;border-radius:2px;">' +
+			mxUtils.htmlEntities(value) + '</div>';
+	};
+
+	/**
+	 * Adds drawing and update of the shape number.
+	 */
+	mxGraphView.prototype.redrawEnumerationState = function(state)
+	{
+		var enumerate = mxUtils.getValue(state.style, 'enumerate', 0) == '1';
+
+		if (enumerate && state.secondLabel == null)
+		{
+			state.secondLabel = new mxText('', new mxRectangle(),
+				mxConstants.ALIGN_LEFT, mxConstants.ALIGN_BOTTOM);
+			state.secondLabel.size = 12;
+			state.secondLabel.state = state;
+			state.secondLabel.dialect = mxConstants.DIALECT_STRICTHTML;
+
+			this.graph.cellRenderer.initializeLabel(state, state.secondLabel);
+		}
+		else if (!enumerate && state.secondLabel != null)
+		{
+			state.secondLabel.destroy();
+			state.secondLabel = null;
+		}
+
+		var shape = state.secondLabel;
+
+		if (shape != null)
+		{
+			var s = state.view.scale;
+			var value = this.createEnumerationValue(state);
+			var bounds = this.graph.model.isVertex(state.cell) ?
+				new mxRectangle(state.x + state.width - 4 * s, state.y + 4 * s, 0, 0) :
+				mxRectangle.fromPoint(state.view.getPoint(state));
+
+			if (!shape.bounds.equals(bounds) || shape.value != value || shape.scale != s)
+			{
+				shape.bounds = bounds;
+				shape.value = value;
+				shape.scale = s;
+				shape.redraw();
+			}
+		}
 	};
 
 	/**

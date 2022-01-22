@@ -272,7 +272,8 @@
 			}
 		});
 		fullscreenAction.visible = urlParams['embedInline'] == '1' ||
-			(document.fullscreenEnabled && document.body.requestFullscreen != null);
+			(window == window.top && document.fullscreenEnabled &&
+			document.body.requestFullscreen != null);
 		fullscreenAction.setToggleAction(true);
 		fullscreenAction.setSelectedCallback(function()
 		{
@@ -772,15 +773,23 @@
 				'https://www.diagrams.net/doc/faq/export-diagram',
 				mxUtils.bind(this, function(scale, transparentBackground, ignoreSelection,
 					addShadow, editable, embedImages, border, cropImage, currentPage,
-					linkTarget, grid, keepTheme, exportType, embedFonts)
+					linkTarget, grid, keepTheme, exportType, embedFonts, lblToSvg)
 				{
 					var val = parseInt(scale);
 					
 					if (!isNaN(val) && val > 0)
 					{
-						editorUi.exportSvg(val / 100, transparentBackground, ignoreSelection,
-							addShadow, editable, embedImages, border, !cropImage, false,
-							linkTarget, keepTheme, exportType, embedFonts);
+						if (lblToSvg)
+						{
+							editorUi.downloadFile('remoteSvg', null, null, ignoreSelection, null, cropImage,
+										 transparentBackground, scale, border, null, editable);
+						}
+						else
+						{
+							editorUi.exportSvg(val / 100, transparentBackground, ignoreSelection,
+								addShadow, editable, embedImages, border, !cropImage, false,
+								linkTarget, keepTheme, exportType, embedFonts);
+						}
 					}
 				}), true, null, 'svg', true);
 		}));
@@ -1024,6 +1033,34 @@
 		{
 			editorUi.actions.addAction('configuration...', function()
 			{
+				// Moves show start screen option to configuration dialog in sketch
+				var splashCb = document.createElement('input');
+				splashCb.setAttribute('type', 'checkbox');
+				splashCb.style.marginRight = '4px';
+				splashCb.checked = mxSettings.getShowStartScreen();
+				splashCb.defaultChecked = splashCb.checked;
+
+				if (editorUi.isSettingsEnabled() && urlParams['sketch'] == '1')
+				{
+					var showSplash = document.createElement('span');
+					showSplash.style['float'] = 'right';
+					showSplash.style.cursor = 'pointer';
+					showSplash.style.userSelect = 'none';
+					showSplash.style.marginTop = '-4px';
+					showSplash.appendChild(splashCb);
+					mxUtils.write(showSplash, mxResources.get('showStartScreen'));
+
+					mxEvent.addListener(showSplash, 'click', function(evt)
+					{
+						if (mxEvent.getSource(evt) != splashCb)
+						{	
+							splashCb.checked = !splashCb.checked;
+						}
+					});
+
+					header = showSplash;
+				}
+
 				// Add help, link button
 				var value = localStorage.getItem(Editor.configurationKey);
 				
@@ -1051,6 +1088,14 @@
 						}
 					});
 				}, 'Shift+Click to Reset Settings']];
+
+				var pluginsAction = editorUi.actions.get('plugins');
+
+				if (pluginsAction != null)
+				{
+					// TODO: Show change message only when plugins have changed
+					buttons.push([mxResources.get('plugins'), pluginsAction.funct]);
+				}
 				
 				if (!EditorUi.isElectronApp)
 				{
@@ -1087,19 +1132,32 @@
 					{
 						try
 						{
-							if (newValue.length > 0)
+							if (splashCb.parentNode != null)
 							{
-								var obj = JSON.parse(newValue);
-								
-								localStorage.setItem(Editor.configurationKey, JSON.stringify(obj));
+								mxSettings.setShowStartScreen(splashCb.checked);
+								mxSettings.save();
+							}
+							
+							if (newValue != value)
+							{
+								editorUi.hideDialog();
 							}
 							else
 							{
-								localStorage.removeItem(Editor.configurationKey);
-							}
+								if (newValue.length > 0)
+								{
+									var obj = JSON.parse(newValue);
+									
+									localStorage.setItem(Editor.configurationKey, JSON.stringify(obj));
+								}
+								else
+								{
+									localStorage.removeItem(Editor.configurationKey);
+								}
 
-							editorUi.hideDialog();
-							editorUi.alert(mxResources.get('restartForChangeRequired'));
+								editorUi.alert(mxResources.get('restartForChangeRequired'));
+								editorUi.hideDialog();
+							}
 						}
 						catch (e)
 						{
@@ -1108,10 +1166,8 @@
 					}
 				}, null, null, null, null, null, true, null, null,
 					'https://www.diagrams.net/doc/faq/configure-diagram-editor',
-					buttons);
+					buttons, splashCb.parentNode);
 		    	
-		    	dlg.textarea.style.width = '600px';
-		    	dlg.textarea.style.height = '380px';
 				editorUi.showDialog(dlg.container, 620, 460, true, false);
 				dlg.init();
 			});
@@ -1274,8 +1330,6 @@
 			}, null, null, null, null, null, true, null, null,
 				'https://www.diagrams.net/doc/faq/apply-layouts');
 	    	
-	    	dlg.textarea.style.width = '600px';
-	    	dlg.textarea.style.height = '380px';
 			editorUi.showDialog(dlg.container, 620, 460, true, true);
 			dlg.init();
 		});
@@ -1778,8 +1832,6 @@
 					}
 				});
 		    	
-		    	dlg.textarea.style.width = '600px';
-		    	dlg.textarea.style.height = '380px';
 				editorUi.showDialog(dlg.container, 620, 460, true, true);
 				dlg.init();
 			}));
@@ -1828,10 +1880,6 @@
 						}
 					}, null, 'Close', null, null, null, true, null, 'Patch', null, buttons);
 			    	
-			    	dlg.textarea.style.width = '600px';
-			    	dlg.textarea.style.height = '380px';
-
-
 					if (snapshot == null)
 					{
 						snapshot = editorUi.getPagesForNode(mxUtils.parseXml(
@@ -2268,7 +2316,7 @@
 			{
 				editorUi.actions.addAction('plugins...', function()
 				{
-					editorUi.showDialog(new PluginsDialog(editorUi).container, 360, 170, true, false);
+					editorUi.showDialog(new PluginsDialog(editorUi).container, 380, 240, true, false);
 				});
 			}
 		}
@@ -3106,13 +3154,15 @@
 
 		this.put('insertLayout', new Menu(mxUtils.bind(this, function(menu, parent)
 		{
-			editorUi.addInsertMenuItems(menu, parent, ['horizontalFlow', 'verticalFlow', '-', 'horizontalTree',
-				'verticalTree', 'radialTree', '-', 'organic', 'circle']);
+			editorUi.addInsertMenuItems(menu, parent, ['horizontalFlow',
+				'verticalFlow', '-', 'horizontalTree', 'verticalTree',
+				'radialTree', '-', 'organic', 'circle']);
 		})));
 
         this.put('insertAdvanced', new Menu(mxUtils.bind(this, function(menu, parent)
         {
-			editorUi.addInsertMenuItems(menu, parent, ['fromText', 'plantUml', 'mermaid', '-', 'formatSql']);
+			editorUi.addInsertMenuItems(menu, parent, ['fromText',
+				'plantUml', 'mermaid', '-', 'formatSql']);
 			
 			menu.addItem(mxResources.get('csv') + '...', null, function()
 			{
@@ -4411,7 +4461,7 @@
 				{
 					selState = graph.cellEditor.saveSelection();
 				}
-		    	
+				
 				var dlg = new FontDialog(this.editorUi, curFontName, curUrl, curType, mxUtils.bind(this, function(fontName, fontUrl, type)
 				{
 					// Restores the selection state

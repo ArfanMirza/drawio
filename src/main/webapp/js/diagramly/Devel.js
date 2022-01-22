@@ -19,12 +19,12 @@ if (!mxIsElectron && location.protocol !== 'http:')
 			//----------------------------------------------------------//
 			//------------- Bootstrap script in index.html -------------//
 			//----------------------------------------------------------//
+			// Version 16.4.4
+			'\'sha256-AVuOIxynOo/05KDLjyp0AoBE+Gt/KE1/vh2pS+yfqes=\' ' +
 			// Version 15.8.3
 			'\'sha256-r/ILW7KMSJxeo9EYqCTzZyCT0PZ9gHN1BLgki7vpR+A=\' ' +
 			// Version 14.6.5
 			'\'sha256-5DtSB5mj34lxcEf+HFWbBLEF49xxJaKnWGDWa/utwQA=\' ' +
-			// Version 14.1.1
-			'\'sha256-8HtpzsH4zj5+RKfTWMxPmWJKBu0OYbn+WuPrLbVky+g=\' ' +
 			//---------------------------------------------------------//
 			//------------- App.main script in index.html -------------//
 			//---------------------------------------------------------//
@@ -34,8 +34,8 @@ if (!mxIsElectron && location.protocol !== 'http:')
 			'; ';
 
 		var styleHashes = '\'sha256-JjkxVHHCCVO0nllPD6hU8bBYSlsikA8TM/o3fhr0bas=\' ' + // index.html
-			'\'sha256-VTG4NbRCx30lYCdLPlgZTrdTopzcdviOjAbS7nk+KbI=\' ' + // Minimal.js/Light
-			'\'sha256-mbkyvR7KVIpvb+DU65TAGUt3LYuyF2kUg8Ktoee8eY4=\' ' + // Minimal.js/Dark
+			'\'sha256-1F7QEyp3oiW4n2eXlhilLpu+H5Wdj4t90pKtEyK/mFE=\' ' + // Minimal.js/Light
+			'\'sha256-V8wOMdVocmGIO0DHZHJsKN6viAFJOJRbsJ7UhdJlmng=\' ' + // Minimal.js/Dark
 			'\'sha256-7kY8ozVqKLIIBwZ24dhdmZkM26PsOlZmEi72RhmZKoM=\' ' + // mxTooltipHandler.js
 			'\'sha256-01chdey79TzZe4ihnvvUXXI5y8MklIcKH+vzDdQvsuU=\' ' + // Editor.js/mathJaxWebkitCss
 			'\'sha256-fGbXK7EYpvNRPca81zPnqJHi2y+34KSgAcZv8mhaSzI=\' ' + // MathJax.js
@@ -66,7 +66,6 @@ if (!mxIsElectron && location.protocol !== 'http:')
 			'style-src %style-src% \'self\'  https://fonts.googleapis.com ' +
 			// Replaces unsafe-inline style-src with hashes with safe-style-src URL parameter
 			((urlParams['safe-style-src'] == '1') ? styleHashes : '\'unsafe-inline\'; ') +
-			'form-action \'none\';' +
 			'base-uri \'none\';' +
 			'child-src \'none\';' +
 			'object-src \'none\';';
@@ -158,7 +157,6 @@ mxscript(drawDevUrl + 'js/deflate/pako.min.js');
 mxscript(drawDevUrl + 'js/deflate/base64.js');
 mxscript(drawDevUrl + 'js/jscolor/jscolor.js');
 mxscript(drawDevUrl + 'js/sanitizer/sanitizer.min.js');
-mxscript(drawDevUrl + 'js/croppie/croppie.min.js');
 mxscript(drawDevUrl + 'js/rough/rough.min.js');
 
 // Uses grapheditor from devhost

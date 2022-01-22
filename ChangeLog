@@ -1,3 +1,132 @@
+21-JAN-2022: 16.4.5
+
+- Corrects SHA for bootstrap
+
+21-JAN-2022: 16.4.4
+
+- Fixes undeclared variable idx
+- Adds a confirmation step to public Github deployment
+- Enables reverse action for edges https://github.com/jgraph/drawio/issues/2569
+- Switches to dev branch of i18n submodule
+- [conf cloud] Uses content.id instead of the deprecated page.id
+- [conf cloud] Fixes errors of spaces in diagram name and NPE in GraphViewer
+
+20-JAN-2022: 16.4.3
+
+- [jira cloud] Adds refresh button to diagram search page
+- Fixes duplicate flipEdge function
+- Adds unknownStyle option for CSV import
+- Uses new app path in Dropbox
+
+19-JAN-2022: 16.4.2
+
+- Fixes NPE on destroyParentHighlight
+
+19-JAN-2022: 16.4.1
+
+- Fixes NPE in CropImageDialog
+- Expands format window on large screens in sketch
+- Fixes parent highlight after change of parent
+
+19-JAN-2022: 16.4.0
+
+- Adds helper function for tree layouts
+- Fixes inkscape svg export size
+- Adds support for special characters and html entities in string properties
+- Adds sketch default font to PWA cache
+- Fixes crop button state
+- Adds insert menu in sketch sidepanel
+- Bypasses proxy for Google fonts, adds font mapping
+- Fixes local folder for Google font in cell style
+- Adds mapping from font CSS URLs to font-face CSS
+
+18-JAN-2022: 16.3.0
+
+- Fixes hardcoded textarea dialog size
+- Adds snapToGrid action
+- Adds flip for groups and edges https://github.com/jgraph/drawio/issues/1895 /1139
+- Fixes copySize enabled state for edges
+- Embeds sketch default font (Architects Daughter)
+- Clears background image with background color
+- Fixes mouse wheel zoom in Brave for Windows https://github.com/jgraph/drawio/issues/2528
+- Adds support for enumerating edges
+
+14-JAN-2022: 16.2.7
+
+- Adds enumerateValue property
+- Adds peristent scratchpad and search in sketch
+- Updated for modified inline CSS
+- Fixes realtime zoom on iPad with sketch https://github.com/jgraph/drawio/issues/2545
+
+12-JAN-2022: 16.2.6
+
+- Fixes NPE
+
+12-JAN-2022: 16.2.5
+
+- Fixes reset of grid color
+- Adds File submenu, windows=0 test URL parameter
+- Adds enumerate property to replace number plugin
+- Adds non-destructive image cropping https://github.com/jgraph/drawio/issues/73
+- Adds Advanced submenu in Import from
+- Adds mailto for short text sharing
+- Adds ellipsis for Comments menu item
+- Fixes broken background page links after import
+
+07-JAN-2022: 16.2.4
+
+- Fixes duplicate edges in CVS import
+- Adds Convert labels to SVG option to SVG export
+
+07-JAN-2022: 16.2.3
+
+- Uses tableRow in ERD shapes
+- Handles special title sizes in table
+- Adds labels checkbox in More Shapes dialog
+
+05-JAN-2022: 16.2.2
+
+- Disables merging for merged cells
+- [conf cloud] Adds support for anchor importing from server + support for adding links to anchors in old editor
+- Adds precedence for alt on mouse down
+- Adds Shift+Click for table range selection
+- Fixes insertRow/Column for selected cell range
+
+04-JAN-2022: 16.2.1
+
+- Fixes cell divider event handling
+
+04-JAN-2022: 16.2.0
+
+- Fixes MathJax anti-aliasing in CLI export https://github.com/jgraph/drawio/issues/2253
+
+03-JAN-2022: 16.1.4
+
+- Fixes possible NPE
+
+03-JAN-2022: 16.1.3
+
+- Fixes highlight for table shapes
+
+30-DEC-2021: 16.1.2
+
+- Adds fillStyle dropdown for image background
+
+29-DEC-2021: 16.1.1
+
+- Avoids creating Blob for parseFile
+- Fixes dimension shape with large stroke size https://github.com/jgraph/drawio/issues/271
+- Hides foreign object warnings in background pages
+- Fixes overflows in minimal and sketch theme https://github.com/jgraph/drawio/issues/2509
+- Fixes freehand mode for Apple pencil on iOS https://github.com/jgraph/drawio/issues/2510
+- Adds tableRow shape, fixes events for merged cells
+- Uses clip path attribute for SVG image clipping
+- Fixes default label background for imported images
+- Fits image to clipPath bounding box
+- Fixes collapsed table foreground https://github.com/jgraph/drawio/issues/2512
+- Fixes overflow in LinkDialog
+- Disables child layout for collapsed cells
+
 23-DEC-2021: 16.1.0
 
 - Fixes inconsistent event cursors on table lines

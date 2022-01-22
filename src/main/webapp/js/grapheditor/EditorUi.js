@@ -1307,45 +1307,60 @@ EditorUi.prototype.initSelectionState = function()
  */
 EditorUi.prototype.updateSelectionStateForTableCells = function(result)
 {
-	// Updates rowspan/colspan for table cell merging
-	// if (result.cells.length > 1 && result.cell)
-	// {
-		//var cells = mxUtils.sortCells(result.cells);
-		// var row = graph.model.getParent(cells[0]);
-		// var table = graph.model.getParent(row);
-		// var colIndex = row.getIndex(cells[0]);
-		// var rowIndex = table.getIndex(row);
-		// var colCount = 1;
+	if (result.cells.length > 1 && result.cell)
+	{
+		var cells = mxUtils.sortCells(result.cells);
+		var model = this.editor.graph.model;
+		var parent = model.getParent(cells[0]);
+		var table = model.getParent(parent);
+		var col = parent.getIndex(cells[0]);
+		var row = table.getIndex(parent);
+		var lastspan = null;
+		var colspan = 1;
+		var rowspan = 1;
+		var index = 0;
 
-		// while (colCount < cells.length && graph.model.getParent(cells[colCount]) == row)
-		// {
-		// 	colCount++;
-		// }
+		var nextRowCell = (row < table.getChildCount() - 1) ?
+			model.getChildAt(model.getChildAt(
+				table, row + 1), col) : null;
+		
+		while (index < cells.length - 1)
+		{
+			var next = cells[++index];
+			
+			if (nextRowCell != null && nextRowCell == next &&
+				(lastspan == null || colspan == lastspan))
+			{
+				lastspan = colspan;
+				colspan = 0;
+				rowspan++;
+				parent = model.getParent(nextRowCell);
+				nextRowCell = (row + rowspan < table.getChildCount()) ?
+					model.getChildAt(model.getChildAt(
+						table, row + rowspan), col) : null;
+			}
+			
+			var state = this.editor.graph.view.getState(next);
 
-		// var index = 1;
-		// var rowCount = 1;
-		// row = table.getChildAt(rowIndex + rowCount);
+			if (next == model.getChildAt(parent, col + colspan) && state != null &&
+				mxUtils.getValue(state.style, 'colspan', 1) == 1 &&
+				mxUtils.getValue(state.style, 'rowspan', 1) == 1)
+			{
+				colspan++;
+			}
+			else
+			{
+				break;
+			}
+		}
 
-		// while (cells[rowCount * colCount + index] == row.getChildAt(index))
-		// {
-		// 	index++;
-		// }
-
-		// row = graph.model.getParent(cells[rowCount * colCount + index]);
-
-		// var rowCount = 1;
-
-
-
-		// for (var i = 1; i < cells.length; i++)
-		// {
-
-		// }
-
-		// var colIndex = graph.getColumnIndex(cells[0]);
-		// var rowIndex = graph.getRowIndex(cells[0]);
-
-	// }
+		if (index == rowspan * colspan - 1)
+		{
+			result.mergeCell = cells[0];
+			result.colspan = colspan;
+			result.rowspan = rowspan;
+		}
+	}
 };
 
 /**
@@ -3230,8 +3245,10 @@ EditorUi.prototype.initCanvas = function()
 						forcedZoom = force;
 						var factor = graph.zoomFactor;
 
-						// Slower zoom for pinch gesture on trackpad
-						if (evt.deltaY != null && Math.round(evt.deltaY) != evt.deltaY)
+						// Slower zoom for pinch gesture on trackpad with max delta to
+						// filter out mouse wheel events in Brave browser for Windows 
+						if (evt.deltaY != null && Math.abs(evt.deltaY) < 40 &&
+							Math.round(evt.deltaY) != evt.deltaY)
 						{
 							factor = 1 + (Math.abs(evt.deltaY) / 20) * (factor - 1);
 						}
@@ -4038,7 +4055,8 @@ EditorUi.prototype.updateActionStates = function()
 	               'editStyle', 'editTooltip', 'editLink', 'backgroundColor', 'borderColor',
 	               'edit', 'toFront', 'toBack', 'solid', 'dashed', 'pasteSize',
 	               'dotted', 'fillColor', 'gradientColor', 'shadow', 'fontColor',
-	               'formattedText', 'rounded', 'toggleRounded', 'sharp', 'strokeColor'];
+	               'formattedText', 'rounded', 'toggleRounded', 'strokeColor',
+				   'sharp', 'snapToGrid'];
 	
 	for (var i = 0; i < actions.length; i++)
 	{
@@ -4049,16 +4067,16 @@ EditorUi.prototype.updateActionStates = function()
 	this.actions.get('pasteSize').setEnabled(this.copiedSize != null && ss.vertices.length > 0);
 	this.actions.get('pasteData').setEnabled(this.copiedValue != null && ss.cells.length > 0);
 	this.actions.get('setAsDefaultStyle').setEnabled(graph.getSelectionCount() == 1);
-	this.actions.get('copySize').setEnabled(graph.getSelectionCount() == 1);
 	this.actions.get('lockUnlock').setEnabled(!graph.isSelectionEmpty());
 	this.actions.get('bringForward').setEnabled(ss.cells.length == 1);
 	this.actions.get('sendBackward').setEnabled(ss.cells.length == 1);
 	this.actions.get('rotation').setEnabled(ss.vertices.length == 1);
 	this.actions.get('wordWrap').setEnabled(ss.vertices.length == 1);
 	this.actions.get('autosize').setEnabled(ss.vertices.length == 1);
+	this.actions.get('copySize').setEnabled(ss.vertices.length == 1);
 	this.actions.get('clearWaypoints').setEnabled(ss.connections);
 	this.actions.get('curved').setEnabled(ss.edges.length > 0);
-	this.actions.get('turn').setEnabled(ss.resizable);
+	this.actions.get('turn').setEnabled(ss.cells.length > 0);
 	this.actions.get('group').setEnabled(!ss.row && !ss.cell &&
 		(ss.cells.length > 1 || (ss.vertices.length == 1 &&
 		graph.model.getChildCount(ss.cells[0]) == 0 &&
@@ -4099,7 +4117,7 @@ EditorUi.prototype.updateActionStates = function()
     this.menus.get('distribute').setEnabled(ss.unlocked &&
 		ss.vertices.length > 1);
     this.menus.get('align').setEnabled(ss.unlocked &&
-		ss.vertices.length > 1);
+		ss.cells.length > 0);
 
     this.updatePasteActionStates();
 };

@@ -644,7 +644,7 @@ App.main = function(callback, createUi)
 			{
 				var content = mxUtils.getTextContent(scripts[0]);
 				
-				if (CryptoJS.MD5(content).toString() != '0fed8c83fc7187e0b39310c4aa3e6d63')
+				if (CryptoJS.MD5(content).toString() != '1f536e2400baaa30261b8c3976d6fe06')
 				{
 					console.log('Change bootstrap script MD5 in the previous line:', CryptoJS.MD5(content).toString());
 					alert('[Dev] Bootstrap script change requires update of CSP');
@@ -3372,7 +3372,7 @@ App.prototype.start = function()
 						}), null, null, null, null, urlParams['browser'] == '1',
 							null, null, true, rowLimit, null, null, null,
 							this.editor.fileExtensions);
-						this.showDialog(dlg.container, 400, (serviceCount > rowLimit) ? 390 : 270,
+						this.showDialog(dlg.container, 420, (serviceCount > rowLimit) ? 390 : 280,
 							true, false, mxUtils.bind(this, function(cancel)
 						{
 							if (cancel && this.getCurrentFile() == null)
@@ -4561,7 +4561,7 @@ App.prototype.saveFile = function(forceDialog, success)
 				this.hideDialog();
 			}), mxResources.get('saveAs'), mxResources.get('download'), null, null, allowTab,
 				null, true, rowLimit, null, null, null, this.editor.fileExtensions, false);
-			this.showDialog(dlg.container, 400, (serviceCount > rowLimit) ? 390 : 270, true, true);
+			this.showDialog(dlg.container, 420, (serviceCount > rowLimit) ? 390 : 280, true, true);
 			dlg.init();
 		}
 	}
@@ -4620,7 +4620,7 @@ App.prototype.loadTemplate = function(url, onload, onerror, templateFilename, as
 			else if (!this.isOffline() && new XMLHttpRequest().upload && this.isRemoteFileFormat(data, filterFn))
 			{
 				// Asynchronous parsing via server
-				this.parseFile(new Blob([data], {type: 'application/octet-stream'}), mxUtils.bind(this, function(xhr)
+				this.parseFileData(data, mxUtils.bind(this, function(xhr)
 				{
 					if (xhr.readyState == 4 && xhr.status >= 200 && xhr.status <= 299 &&
 						xhr.responseText.substring(0, 13) == '<mxGraphModel')
@@ -6640,7 +6640,7 @@ App.prototype.convertFile = function(url, filename, mimeType, extension, success
 				}
 				else if (Graph.fileSupport && new XMLHttpRequest().upload && this.isRemoteFileFormat(data, url))
 				{
-					this.parseFile(new Blob([data], {type: 'application/octet-stream'}), mxUtils.bind(this, function(xhr)
+					this.parseFileData(data, mxUtils.bind(this, function(xhr)
 					{
 						if (xhr.readyState == 4)
 						{
@@ -6920,6 +6920,9 @@ App.prototype.updateHeader = function()
 		
 		mxEvent.addListener(this.toggleFormatElement, 'click', mxUtils.bind(this, function(evt)
 		{
+			EditorUi.logEvent({category: 'TOOLBAR-ACTION-',
+				action: 'formatPanel'});
+		
 			this.actions.get('formatPanel').funct();
 			mxEvent.consume(evt);
 		}));
@@ -6979,6 +6982,9 @@ App.prototype.updateHeader = function()
 		mxEvent.addListener(this.fullscreenElement, 'click', mxUtils.bind(this, function(evt)
 		{
 			var visible = this.fullscreenMode;
+
+			EditorUi.logEvent({category: 'TOOLBAR-ACTION-',
+				action: 'fullscreen' , currentstate: visible});
 			
 			if (uiTheme != 'atlas' && urlParams['embed'] != '1')
 			{
@@ -7034,6 +7040,8 @@ App.prototype.updateHeader = function()
 			// Toggles compact mode
 			mxEvent.addListener(this.toggleElement, 'click', mxUtils.bind(this, function(evt)
 			{
+				EditorUi.logEvent({category: 'TOOLBAR-ACTION-',
+					action: 'toggleUI'});
 				this.toggleCompactMode();
 				mxEvent.consume(evt);
 			}));
